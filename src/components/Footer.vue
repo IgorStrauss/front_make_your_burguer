@@ -1,5 +1,5 @@
 <template>
-  <footer id="footer">
+  <footer id="footer" class="container-sm">
     <p>&copy; MarquesIgor desenvolvedor</p>
   </footer>
 </template>
@@ -20,5 +20,6 @@ export default {
   justify-content: center;
   bottom: 0;
   width: 100%;
+  position: fixed;
 }
 </style>

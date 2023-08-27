@@ -1,5 +1,5 @@
 <template>
-  <div id="nav">
+  <div id="nav" class="container-sm">
     <router-link to="/" id="logo-url">
       <img :src="logo" :alt="alt" id="logo" />
     </router-link>

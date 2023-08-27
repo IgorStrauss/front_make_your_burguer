@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container-sm">
     <NavbarComponent :logo="logo_src" :alt="app_name" />
     <router-view />
     <FooterComponent />
