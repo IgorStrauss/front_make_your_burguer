@@ -1,7 +1,6 @@
 <template>
   <div class="message-container">
-    <p>Esta e a mensagem do sistema</p>
-    <!-- continuar formatação da props {{ msg }}-->
+    <p>{{ msg }}</p>
   </div>
 </template>
 
