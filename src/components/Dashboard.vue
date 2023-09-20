@@ -11,7 +11,15 @@
       </div>
     </div>
     <div class="container-sm" id="burger-table-rows">
-      <div id="burger-table-row" v-for="burger in burgers" :key="burger.id">
+      <div
+        id="burger-table-row"
+        v-for="burger in burgers"
+        :key="burger.id"
+        v-show="
+          burger.status_burguer !== 'CONCLUIDO' &&
+          burger.status_burguer !== 'CANCELADO'
+        "
+      >
         <div class="order-number">{{ burger.id }}</div>
         <div>{{ burger.cliente }}</div>
         <div>Pão {{ getPaoTipo(burger.paes) }}</div>
