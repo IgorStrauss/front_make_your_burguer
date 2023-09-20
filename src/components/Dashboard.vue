@@ -18,7 +18,7 @@
         <div>{{ getCarneTipo(burger.carne) }}</div>
         <div>
           <ul>
-            <li v-for="(opcional, index) in burger.opcionais" :key="index">
+            <li v-for="(opcional, index) in burger.opcionaisTipos" :key="index">
               {{ opcional }}
             </li>
           </ul>
@@ -76,10 +76,14 @@ export default {
         // Obtendo a lista de pedidos
         const response = await axiosInstance.get("burguers/");
         const data = await response.data;
-        this.burgers = data;
-        console.log("Pedidos recebidos:", this.burgers);
-        // Resgatando os status dos pedidos
-        //await this.getStatusBurger();
+        this.burgers = await Promise.all(
+          data.map(async (burger) => {
+            burger.opcionaisTipos = await this.getMappedOpcionais(
+              burger.opcionais
+            );
+            return burger;
+          })
+        );
       } catch (error) {
         console.error("Erro ao buscar pedidos:", error);
       }
@@ -89,7 +93,6 @@ export default {
         const response = await axiosInstance.get("paes/");
         this.paes = response.data;
         console.log("Itens de paes recebidos:", this.paes);
-        //novo local para a chamada da função
         this.getRequestBurgers();
       } catch (error) {
         console.error("Erro ao buscar pães:", error);
@@ -132,6 +135,15 @@ export default {
       const carne = this.carnes.find((carne) => carne.id === carneId);
       return carne ? carne.tipo : "";
     },
+    getMappedOpcionais(opcionaisIds) {
+      const mappedOpcionais = opcionaisIds.map((id) => {
+        const opcional = this.opcionais_data.find((item) => item.id === id);
+        const opcionalNome = opcional ? opcional.tipo : "";
+        //console.log(`Mapeando opcional com ID ${id} para nome ${opcionalNome}`);
+        return opcionalNome;
+      });
+      return mappedOpcionais;
+    },
     async deleteBurger(id) {
       try {
         await axiosInstance.delete(`burguers/${id}/`);
@@ -147,6 +159,7 @@ export default {
     //this.getRequestBurgers();
     this.fetchPaes();
     this.fetchCarnes();
+    this.fetchOpcionais();
   },
 };
 </script>
