@@ -24,14 +24,21 @@
           </ul>
         </div>
         <div>
-          <select name="status" class="status custom-select">
+          <select
+            name="status"
+            class="status custom-select"
+            v-model="burger.status_burguer"
+            @change="updateStatus(burger.id, burger.status_burguer)"
+          >
+            <option value="{{ burger.status_burguer }}">
+              {{ burger.status_burguer }}
+            </option>
             <option
-              v-for="status in status_burguer"
-              :key="status.id"
-              value="status.tipo"
-              :selected="burger.status == status.tipo"
+              v-for="choice in status_choices"
+              :key="choice[0]"
+              :value="choice[0]"
             >
-              {{ status.tipo }}
+              {{ choice[1] }}
             </option>
           </select>
           <button class="delete-btn" @click="deleteBurger(burger.id)">
@@ -52,7 +59,12 @@ export default {
     return {
       burgers: [],
       burger_id: "",
-      status_burguer: [],
+      status_choices: [
+        ["SOLICITADO", "SOLICITADO"],
+        ["EM PRODUÇÃO", "EM PRODUÇÃO"],
+        ["CONCLUIDO", "CONCLUIDO"],
+        ["CANCELADO", "CANCELADO"],
+      ],
     };
   },
   methods: {
@@ -69,19 +81,19 @@ export default {
         console.error("Erro ao buscar pedidos:", error);
       }
     },
-    async getStatusBurger() {
+    async updateStatus(burgerId, newStatus) {
       try {
-        const req = await axiosInstance.get("status-burguer/");
-        const data = await req.data;
-        this.status_burguer = data;
-        console.log("Status do pedido:", this.status_burguer);
+        await axiosInstance.patch(`burguers/${burgerId}/`, {
+          status_burguer: newStatus,
+        }),
+          console.log("Pedido atualizado com sucesso");
       } catch (error) {
-        console.error("Erro ao buscar status do pedido:", error);
+        console.error("Erro ao atualizar pedido:", error);
       }
     },
     async deleteBurger(id) {
       try {
-        await axiosInstance.delete(`burguers/${id}`);
+        await axiosInstance.delete(`burguers/${id}/`);
         //Implementar msg de exclusão
         this.getRequestBurgers();
       } catch (error) {

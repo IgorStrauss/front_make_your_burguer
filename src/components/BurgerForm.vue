@@ -67,7 +67,6 @@ export default defineComponent({
       pao: "",
       carne: "",
       opcionais: [],
-      status_burguer: "",
       listar_burguers: [],
       msg: "",
     };
@@ -100,15 +99,6 @@ export default defineComponent({
         console.error("Erro ao buscar opcionais:", error);
       }
     },
-    async fetchStatusBurger() {
-      try {
-        const response = await axiosInstance.get("status-burguer/");
-        this.status_burguer = response.data;
-        console.log("Status do pedido:", this.status_burguer);
-      } catch (error) {
-        console.error("Erro ao definir status pedido:", error);
-      }
-    },
     async fetchSBurgers() {
       try {
         const response = await axiosInstance.get("burguers/");
@@ -127,7 +117,6 @@ export default defineComponent({
         paes: this.pao,
         carne: this.carne,
         opcionais: Array.from(this.opcionais),
-        status_burguer: 1,
       };
       console.log("Dados que serão enviados:", data);
       try {
@@ -146,12 +135,10 @@ export default defineComponent({
         this.pao = "";
         this.carne = "";
         this.opcionais = [];
-        this.status_burguer = 1;
         //Re-chamar os dados para atualizar no formulário vazio
         this.fetchPaes();
         this.fetchCarnes();
         this.fetchOpcionais();
-        this.fetchStatusBurger();
         this.fetchSBurgers();
       } catch (error) {
         console.error("Erro ao criar o burger:", error);
@@ -162,7 +149,6 @@ export default defineComponent({
     this.fetchPaes();
     this.fetchCarnes();
     this.fetchOpcionais();
-    this.fetchStatusBurger();
     this.fetchSBurgers();
   },
 });
