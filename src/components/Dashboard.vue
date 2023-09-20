@@ -78,7 +78,7 @@ export default {
         const response = await axiosInstance.get("burguers/");
         const data = await response.data;
         this.burgers = data;
-        console.log("Pedidos recebidos linha 81:", this.burgers);
+        console.log("Pedidos recebidos:", this.burgers);
         // Resgatando os status dos pedidos
         //await this.getStatusBurger();
       } catch (error) {
