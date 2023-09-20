@@ -14,8 +14,9 @@
       <div id="burger-table-row" v-for="burger in burgers" :key="burger.id">
         <div class="order-number">{{ burger.id }}</div>
         <div>{{ burger.cliente }}</div>
-        <div>{{ burger.paes }}</div>
-        <div>{{ burger.carne }}</div>
+        <div>{{ burger.paes }} pao</div>
+        <!--<div>{{ getPaoTipo(burger.pao) }}</div>-->
+        <div>{{ burger.carne }} carne</div>
         <div>
           <ul>
             <li v-for="(opcional, index) in burger.opcionais" :key="index">
@@ -24,14 +25,21 @@
           </ul>
         </div>
         <div>
-          <select name="status" class="status custom-select">
+          <select
+            name="status"
+            class="status custom-select"
+            v-model="burger.status_burguer"
+            @change="updateStatus(burger.id, burger.status_burguer)"
+          >
+            <option value="{{ burger.status_burguer }}">
+              {{ burger.status_burguer }}
+            </option>
             <option
-              v-for="status in status_burguer"
-              :key="status.id"
-              value="status.tipo"
-              :selected="burger.status == status.tipo"
+              v-for="choice in status_choices"
+              :key="choice[0]"
+              :value="choice[0]"
             >
-              {{ status.tipo }}
+              {{ choice[1] }}
             </option>
           </select>
           <button class="delete-btn" @click="deleteBurger(burger.id)">
@@ -52,7 +60,15 @@ export default {
     return {
       burgers: [],
       burger_id: "",
-      status_burguer: [],
+      status_choices: [
+        ["SOLICITADO", "SOLICITADO"],
+        ["EM PRODUÇÃO", "EM PRODUÇÃO"],
+        ["CONCLUIDO", "CONCLUIDO"],
+        ["CANCELADO", "CANCELADO"],
+      ],
+      paes: [],
+      carnes: [],
+      opcionais_data: [],
     };
   },
   methods: {
@@ -64,24 +80,55 @@ export default {
         this.burgers = data;
         console.log("Pedidos recebidos:", this.burgers);
         // Resgatando os status dos pedidos
-        await this.getStatusBurger();
+        //await this.getStatusBurger();
       } catch (error) {
         console.error("Erro ao buscar pedidos:", error);
       }
     },
-    async getStatusBurger() {
+    async fetchPaes() {
       try {
-        const req = await axiosInstance.get("status-burguer/");
-        const data = await req.data;
-        this.status_burguer = data;
-        console.log("Status do pedido:", this.status_burguer);
+        const response = await axiosInstance.get("paes/");
+        this.paes = response.data;
+        console.log("Itens de paes recebidos:", this.paes);
       } catch (error) {
-        console.error("Erro ao buscar status do pedido:", error);
+        console.error("Erro ao buscar pães:", error);
       }
+    },
+    async fetchCarnes() {
+      try {
+        const response = await axiosInstance.get("carnes/");
+        this.carnes = response.data;
+        console.log("Itens de carnes recebidos:", this.carnes);
+      } catch (error) {
+        console.error("Erro ao buscar carnes:", error);
+      }
+    },
+    async fetchOpcionais() {
+      try {
+        const response = await axiosInstance.get("opcionais/");
+        this.opcionais_data = response.data;
+        console.log("Itens de opcionais recebidos:", this.opcionais_data);
+      } catch (error) {
+        console.error("Erro ao buscar opcionais:", error);
+      }
+    },
+    async updateStatus(burgerId, newStatus) {
+      try {
+        await axiosInstance.patch(`burguers/${burgerId}/`, {
+          status_burguer: newStatus,
+        }),
+          console.log("Pedido atualizado com sucesso");
+      } catch (error) {
+        console.error("Erro ao atualizar pedido:", error);
+      }
+    },
+    getPaoTipo(paoId) {
+      const pao = this.paes.find((pao) => pao.id === paoId);
+      return pao ? pao.tipo : "";
     },
     async deleteBurger(id) {
       try {
-        await axiosInstance.delete(`burguers/${id}`);
+        await axiosInstance.delete(`burguers/${id}/`);
         //Implementar msg de exclusão
         this.getRequestBurgers();
       } catch (error) {
@@ -89,8 +136,10 @@ export default {
       }
     },
   },
+
   mounted() {
     this.getRequestBurgers();
+    this.fetchPaes();
   },
 };
 </script>
