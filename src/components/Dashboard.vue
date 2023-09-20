@@ -14,8 +14,8 @@
       <div id="burger-table-row" v-for="burger in burgers" :key="burger.id">
         <div class="order-number">{{ burger.id }}</div>
         <div>{{ burger.cliente }}</div>
-        <div>{{ burger.paes }} pao</div>
-        <!--<div>{{ getPaoTipo(burger.pao) }}</div>-->
+        <!--<div>{{ burger.paes }} pao</div>-->
+        <div>Pão {{ getPaoTipo(burger.paes) }}</div>
         <div>{{ burger.carne }} carne</div>
         <div>
           <ul>
@@ -90,6 +90,8 @@ export default {
         const response = await axiosInstance.get("paes/");
         this.paes = response.data;
         console.log("Itens de paes recebidos:", this.paes);
+        //novo local para a chamada da função
+        this.getRequestBurgers();
       } catch (error) {
         console.error("Erro ao buscar pães:", error);
       }
@@ -138,7 +140,7 @@ export default {
   },
 
   mounted() {
-    this.getRequestBurgers();
+    //this.getRequestBurgers();
     this.fetchPaes();
   },
 };
