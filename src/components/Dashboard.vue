@@ -14,12 +14,11 @@
       <div id="burger-table-row" v-for="burger in burgers" :key="burger.id">
         <div class="order-number">{{ burger.id }}</div>
         <div>{{ burger.cliente }}</div>
-        <div>{{ burger.paes }} pao</div>
-        <!--<div>{{ getPaoTipo(burger.pao) }}</div>-->
-        <div>{{ burger.carne }} carne</div>
+        <div>Pão {{ getPaoTipo(burger.paes) }}</div>
+        <div>{{ getCarneTipo(burger.carne) }}</div>
         <div>
           <ul>
-            <li v-for="(opcional, index) in burger.opcionais" :key="index">
+            <li v-for="(opcional, index) in burger.opcionaisTipos" :key="index">
               {{ opcional }}
             </li>
           </ul>
@@ -77,10 +76,14 @@ export default {
         // Obtendo a lista de pedidos
         const response = await axiosInstance.get("burguers/");
         const data = await response.data;
-        this.burgers = data;
-        console.log("Pedidos recebidos:", this.burgers);
-        // Resgatando os status dos pedidos
-        //await this.getStatusBurger();
+        this.burgers = await Promise.all(
+          data.map(async (burger) => {
+            burger.opcionaisTipos = await this.getMappedOpcionais(
+              burger.opcionais
+            );
+            return burger;
+          })
+        );
       } catch (error) {
         console.error("Erro ao buscar pedidos:", error);
       }
@@ -90,6 +93,7 @@ export default {
         const response = await axiosInstance.get("paes/");
         this.paes = response.data;
         console.log("Itens de paes recebidos:", this.paes);
+        this.getRequestBurgers();
       } catch (error) {
         console.error("Erro ao buscar pães:", error);
       }
@@ -99,6 +103,7 @@ export default {
         const response = await axiosInstance.get("carnes/");
         this.carnes = response.data;
         console.log("Itens de carnes recebidos:", this.carnes);
+        this.getCarneTipo();
       } catch (error) {
         console.error("Erro ao buscar carnes:", error);
       }
@@ -126,6 +131,19 @@ export default {
       const pao = this.paes.find((pao) => pao.id === paoId);
       return pao ? pao.tipo : "";
     },
+    getCarneTipo(carneId) {
+      const carne = this.carnes.find((carne) => carne.id === carneId);
+      return carne ? carne.tipo : "";
+    },
+    getMappedOpcionais(opcionaisIds) {
+      const mappedOpcionais = opcionaisIds.map((id) => {
+        const opcional = this.opcionais_data.find((item) => item.id === id);
+        const opcionalNome = opcional ? opcional.tipo : "";
+        //console.log(`Mapeando opcional com ID ${id} para nome ${opcionalNome}`);
+        return opcionalNome;
+      });
+      return mappedOpcionais;
+    },
     async deleteBurger(id) {
       try {
         await axiosInstance.delete(`burguers/${id}/`);
@@ -138,8 +156,10 @@ export default {
   },
 
   mounted() {
-    this.getRequestBurgers();
+    //this.getRequestBurgers();
     this.fetchPaes();
+    this.fetchCarnes();
+    this.fetchOpcionais();
   },
 };
 </script>
