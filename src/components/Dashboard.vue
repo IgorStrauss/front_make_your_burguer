@@ -14,9 +14,8 @@
       <div id="burger-table-row" v-for="burger in burgers" :key="burger.id">
         <div class="order-number">{{ burger.id }}</div>
         <div>{{ burger.cliente }}</div>
-        <!--<div>{{ burger.paes }} pao</div>-->
         <div>Pão {{ getPaoTipo(burger.paes) }}</div>
-        <div>{{ burger.carne }} carne</div>
+        <div>{{ getCarneTipo(burger.carne) }}</div>
         <div>
           <ul>
             <li v-for="(opcional, index) in burger.opcionais" :key="index">
@@ -101,6 +100,7 @@ export default {
         const response = await axiosInstance.get("carnes/");
         this.carnes = response.data;
         console.log("Itens de carnes recebidos:", this.carnes);
+        this.getCarneTipo();
       } catch (error) {
         console.error("Erro ao buscar carnes:", error);
       }
@@ -128,6 +128,10 @@ export default {
       const pao = this.paes.find((pao) => pao.id === paoId);
       return pao ? pao.tipo : "";
     },
+    getCarneTipo(carneId) {
+      const carne = this.carnes.find((carne) => carne.id === carneId);
+      return carne ? carne.tipo : "";
+    },
     async deleteBurger(id) {
       try {
         await axiosInstance.delete(`burguers/${id}/`);
@@ -142,6 +146,7 @@ export default {
   mounted() {
     //this.getRequestBurgers();
     this.fetchPaes();
+    this.fetchCarnes();
   },
 };
 </script>
